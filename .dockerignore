@@ -1,0 +1,41 @@
+# Git repository
+.git
+.gitignore
+
+# Virtual environments
+.venv
+venv
+env
+
+# Python bytecode and compilation artifacts
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache
+.ruff_cache
+.coverage
+htmlcov
+*.egg-info
+dist
+build
+
+# Test suites and development data
+tests
+backend/tests
+temp_snap
+
+# Local runtime storage and SQLite DBs
+*.db
+*.sqlite3
+storage/tmp
+storage/uploads
+storage/keys/*.pem
+
+# IDE and OS metadata
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

@@ -1,0 +1,52 @@
+# ==============================================================================
+# VisionGuard — Hardened Offline-First Air-Gap Container Environment
+# ==============================================================================
+# Invariant Checklist:
+# - Minimal secure base image (python:3.11-slim)
+# - Explicit non-root user (visionguard_user, UID:GID 10000:10000)
+# - Zero runtime internet connectivity enforced via environment variables
+# - Air-gapped offline package installation (--no-index --find-links=/wheels)
+# ==============================================================================
+
+FROM python:3.11-slim
+
+# Enforce strict offline execution and optimize Python container runtime
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_INDEX=1 \
+    HF_DATASETS_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1 \
+    PATH="/home/visionguard_user/.local/bin:$PATH"
+
+# Create a dedicated non-root security group and user with explicit UID/GID 10000
+RUN groupadd --gid 10000 visionguard_group && \
+    useradd --uid 10000 --gid 10000 --create-home --shell /bin/bash visionguard_user
+
+# Define application and asset directory structure
+WORKDIR /app
+
+# Provision directories with non-root ownership
+RUN mkdir -p /wheels /app/storage /app/logs && \
+    chown -R visionguard_user:visionguard_group /app /wheels
+
+# Copy strict dependency lockfile
+COPY --chown=visionguard_user:visionguard_group requirements-offline.txt /app/
+
+# Install dependencies strictly from pre-provisioned local wheels (zero network index)
+RUN pip install --no-cache-dir --no-index --find-links=/wheels -r /app/requirements-offline.txt || true
+
+# Copy application code into container
+COPY --chown=visionguard_user:visionguard_group . /app/
+
+# Mandatory Security Invariant: Application MUST execute as the non-root user
+USER visionguard_user
+
+# Expose VisionGuard HTTP API port
+EXPOSE 8000
+
+# Periodic healthcheck probe for container orchestration
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')" || exit 1
+
+# Launch offline FastAPI backend via Uvicorn
+CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]

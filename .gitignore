@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.env
+
+# Frontend
+node_modules/
+dist/
+build/
+.coverage
+coverage/
+
+# Local data / artifacts / secrets
+/data/raw/**
+!/data/raw/.gitkeep
+/data/processed/**
+!/data/processed/.gitkeep
+/data/reference/**
+!/data/reference/.gitkeep
+/data/**/*.db
+/data/**/*.sqlite
+/data/**/*.sqlite3
+*.db-shm
+*.db-wal
+/data/quarantine/**
+!/data/quarantine/.gitkeep
+*.pt
+*.pth
+*.onnx
+*.pem
+*.key
+*.secret
+
+# Local outputs
+/reports/**
+!/reports/.gitkeep
+/experiments/**/outputs/**
+temp_snap/
+storage/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

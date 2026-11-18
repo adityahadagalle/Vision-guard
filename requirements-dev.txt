@@ -1,0 +1,14 @@
+# ==============================================================================
+# VisionGuard Development & Testing Dependencies
+# ==============================================================================
+
+-r requirements.txt
+
+# Testing & Test Execution
+pytest>=8.0.0,<10.0.0
+pytest-asyncio>=0.23.0,<1.5.0
+pytest-cov>=4.1.0,<8.0.0
+httpx>=0.27.0,<1.0.0
+
+# Code Quality, Formatting & Linting
+ruff>=0.4.0
